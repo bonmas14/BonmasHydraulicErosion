@@ -2,14 +2,14 @@
 
 namespace BonmasHydraulicErosion
 {
-    internal class World
+    internal class MapContainer
     {
         public float[,] Map { get; private set; }
 
         public readonly int width;
         public readonly int height;
 
-        public World(float[,] map)
+        public MapContainer(float[,] map)
         {
             Map = map;
 

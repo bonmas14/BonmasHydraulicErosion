@@ -11,7 +11,7 @@
 
         const float stepSize = 1.6f;
 
-        public void IterateParticle(Vector2 pos, World world)
+        public void IterateParticle(Vector2 pos, MapContainer world)
         {
             Vector2 accel = new Vector2(0, 0);
 

@@ -5,66 +5,64 @@ namespace BonmasHydraulicErosion
 {
     public class HydraulicErosion
     {
-        private Random random;
+        private Random posGen;
+        private ILogger logger;
 
-        public HydraulicErosion(int seed)
+        public HydraulicErosion(int seed, ILogger logger)
         {
-            random = new Random(seed);
+            posGen = new Random(seed);
+
+            this.logger = logger;
         }
 
-        public float[,] ProcessErosion(float[,] map, int particleCount, int iterations)
+        public float[,] ProcessErosion(float[,] map, int countOfDroplets, int iterations)
         {
-            World world = new World(map);
+            MapContainer world = new MapContainer(map);
 
             int width  = world.width;
             int height = world.height;
 
-            Droplet[] particles = new Droplet[particleCount];
+            Droplet[] droplets = new Droplet[countOfDroplets];
 
-            for (int i = 0; i < particleCount; i++)
+            for (int i = 0; i < countOfDroplets; i++)
             {
-                particles[i] = new Droplet();
+                droplets[i] = new Droplet();
             }
 
             int tasksCount = Environment.ProcessorCount * 8;
 
-            Task[] particlesTasks = new Task[tasksCount];
+            Task[] tasks = new Task[tasksCount];
+
+            logger.SetLimits(countOfDroplets, iterations);
 
             for (int i = 0; i < iterations; i++)
             {
-                for (int j = 0; j < particleCount; j++)
+                for (int j = 0; j < countOfDroplets; j++)
                 {
-                    var particle = particles[j];
+                    var droplet = droplets[j];
 
-                    particlesTasks[j % tasksCount] = Task.Run(() =>
+                    tasks[j % tasksCount] = Task.Run(() =>
                     {
-                        Vector2 position = new Vector2(random.Next(width), random.Next(height));
+                        Vector2 position = new Vector2(posGen.Next(width), posGen.Next(height));
 
-                        particle.IterateParticle(position, world);
+                        droplet.IterateParticle(position, world);
                     });
 
                     if ((j % tasksCount) == 0 && j != 0)
                     {
-                        Task.WaitAll(particlesTasks);
+                        Task.WaitAll(tasks);
 
-                        WriteDiagnosticData(j, particleCount, i, iterations);
+                        logger.Log(j, i);
                     }
                 }
-
-                Task.WaitAll(particlesTasks);
+                Task.WaitAll(tasks);
             }
 
-            WriteDiagnosticData(particleCount, particleCount, iterations, iterations);
-
+            logger.Log(countOfDroplets, iterations);
+            Console.WriteLine();
+            
             return map;
         }
 
-        private void WriteDiagnosticData(int curPart, int parts, int curIter, int iters)
-        {
-
-            Console.Write("p:[{0}/{1}] i:[{2}/{3}]\0", curPart, parts, curIter, iters);
-
-            Console.CursorLeft = 0;
-        }
     }
 }
