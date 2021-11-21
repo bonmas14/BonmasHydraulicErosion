@@ -15,6 +15,14 @@ namespace BonmasHydraulicErosion
             this.logger = logger;
         }
 
+        /// <summary>
+        /// Erosion proccessing on map
+        /// </summary>
+        /// <param name="map">float height map with values from 0 to 1 (not critical)</param>
+        /// <param name="countOfDroplets">count of droplets on iteration</param>
+        /// <param name="iterations"></param>
+        /// <returns>eroded float heightmap</returns>
+
         public float[,] ProcessErosion(float[,] map, int countOfDroplets, int iterations)
         {
             MapContainer world = new MapContainer(map);
