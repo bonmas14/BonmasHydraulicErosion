@@ -38,14 +38,14 @@
                 float worldHeight = world.Map[wpX, wpY];
                 float particleHeight = world.Map[(int)pos.X, (int)pos.Y];
 
-                float maxSediment = volume * accel.Magnitude * (worldHeight - particleHeight);
+                float eqCapacity = volume * accel.Magnitude * (worldHeight - particleHeight);
 
-                if (maxSediment < 0.0f) maxSediment = 0.0f;
+                if (eqCapacity < 0.0f) eqCapacity = 0.0f;
 
-                float cdiff = maxSediment - sediment;
+                float difference = eqCapacity - sediment;
 
-                sediment += stepSize * depositionRate * cdiff;
-                worldHeight -= stepSize * volume * depositionRate * cdiff;
+                sediment += stepSize * depositionRate * difference;
+                worldHeight -= stepSize * volume * depositionRate * difference;
 
                 world.Map[wpX, wpY] = worldHeight;
 
